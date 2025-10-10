@@ -12,9 +12,6 @@ import threading
 import time as time_module
 
 
-logger = logging.getLogger(__name__)
-
-
 
 # Настройка логирования
 logging.basicConfig(
