@@ -2,6 +2,7 @@ import re
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
 import sqlite3
+from logging.handlers import RotatingFileHandler
 from datetime import datetime, timedelta
 import logging
 from config import config
@@ -10,10 +11,24 @@ from database import init_db_manager, get_db_manager
 import threading
 import time as time_module
 
-# Настройка логирования
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
 logger = logging.getLogger(__name__)
 
+
+
+# Настройка логирования
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        RotatingFileHandler(
+            'logs/bot.log', 
+            maxBytes=1024*1024*10,  # 10MB
+            backupCount=5
+        ),
+        logging.StreamHandler()
+    ]
+)
 # Глобальные переменные для уведомлений
 notification_thread = None
 stop_notification_thread = False
