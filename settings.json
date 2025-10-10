@@ -1,0 +1,16 @@
+{
+    "token": "8274761502:AAEiNwYmByrez_rSG8ArV7BMH8LCvK5cpLQ",
+    "working_hours": {
+        "start": "08:00",
+        "end": "20:00"
+    },
+    "booking_range_days": 14,
+    "time_intervals": [15, 30, 45, 60, 75, 90, 105, 120, 150, 180, 210, 240],
+    "database_file": "meeting_room.db",
+    
+    "notifications": {
+        "enable": true,
+        "reminder_minutes": 15,
+        "reminder_message": "⏰ Напоминание: Ваша бронь переговорной комнаты начинается через {minutes} минут!"
+    }
+}
