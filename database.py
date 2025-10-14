@@ -64,7 +64,7 @@ class DatabaseManager:
     
     def get_all_bookings(self) -> List[Tuple]:
         """Получение всех активных бронирований (только будущие)"""
-        conn = self.get_connection()
+        conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
         current_date = datetime.now().strftime("%d.%m.%Y")
         cursor.execute("""
