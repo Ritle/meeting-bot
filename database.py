@@ -68,33 +68,71 @@ class DatabaseManager:
     
     def get_all_bookings(self) -> List[Tuple]:
         """Получение всех активных бронирований (только будущие)"""
-        conn = sqlite3.connect(self.db_file)
+        conn = self.get_connection()
         cursor = conn.cursor()
         current_date = datetime.now().strftime("%d.%m.%Y")
+        
+        # Преобразуем дату в формат YYYYMMDD для сравнения
+        current_date_numeric = datetime.now().strftime("%Y%m%d")
+        
+        # Получаем все бронирования и фильтруем в Python
         cursor.execute("""
             SELECT date, start_time, end_time, user_name 
             FROM bookings 
-            WHERE date >= ? 
             ORDER BY date, start_time
-        """, (current_date,))
-        bookings = cursor.fetchall()
+        """)
+        all_bookings = cursor.fetchall()
         conn.close()
-        return bookings
+        
+        # Фильтруем только будущие бронирования
+        filtered_bookings = []
+        for date, start_time, end_time, user_name in all_bookings:
+            try:
+                # Преобразуем дату из формата DD.MM.YYYY в YYYYMMDD
+                booking_date = datetime.strptime(date, "%d.%m.%Y")
+                booking_date_numeric = booking_date.strftime("%Y%m%d")
+                
+                if booking_date_numeric >= current_date_numeric:
+                    filtered_bookings.append((date, start_time, end_time, user_name))
+            except ValueError:
+                # Если формат даты некорректный, пропускаем
+                continue
+        
+        return filtered_bookings
+    
     
     def get_user_bookings(self, user_id: int) -> List[Tuple]:
         """Получение бронирований пользователя (только будущие)"""
         conn = self.get_connection()
         cursor = conn.cursor()
         current_date = datetime.now().strftime("%d.%m.%Y")
+        current_date_numeric = datetime.now().strftime("%Y%m%d")
+        
+        # Получаем все бронирования пользователя
         cursor.execute("""
             SELECT date, start_time, end_time 
             FROM bookings 
-            WHERE user_id = ? AND date >= ? 
+            WHERE user_id = ? 
             ORDER BY date, start_time
-        """, (user_id, current_date))
-        bookings = cursor.fetchall()
+        """, (user_id,))
+        all_bookings = cursor.fetchall()
         conn.close()
-        return bookings
+        
+        # Фильтруем только будущие бронирования
+        filtered_bookings = []
+        for date, start_time, end_time in all_bookings:
+            try:
+                # Преобразуем дату из формата DD.MM.YYYY в YYYYMMDD
+                booking_date = datetime.strptime(date, "%d.%m.%Y")
+                booking_date_numeric = booking_date.strftime("%Y%m%d")
+                
+                if booking_date_numeric >= current_date_numeric:
+                    filtered_bookings.append((date, start_time, end_time))
+            except ValueError:
+                # Если формат даты некорректный, пропускаем
+                continue
+        
+        return filtered_bookings
     
     def cancel_user_bookings(self, user_id: int) -> bool:
         """Отмена бронирований пользователя"""
