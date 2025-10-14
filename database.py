@@ -63,15 +63,16 @@ class DatabaseManager:
         return result
     
     def get_all_bookings(self) -> List[Tuple]:
-        """Получение всех бронирований"""
-        conn = sqlite3.connect(self.db_file)
+        """Получение всех активных бронирований (только будущие)"""
+        conn = self.get_connection()
         cursor = conn.cursor()
+        current_date = datetime.now().strftime("%d.%m.%Y")
         cursor.execute("""
             SELECT date, start_time, end_time, user_name 
             FROM bookings 
-            WHERE date >= date('now') 
+            WHERE date >= ? 
             ORDER BY date, start_time
-        """)
+        """, (current_date,))
         bookings = cursor.fetchall()
         conn.close()
         return bookings
