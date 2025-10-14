@@ -388,13 +388,14 @@ def show_schedule(update: Update, context: CallbackContext):
     keyboard = [[InlineKeyboardButton("⬅️ Назад", callback_data="main_menu")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    query.edit_message_text(message, reply_markup=reply_markup, parse_mode='Markdown')
+    query.edit_message_text(message, reply_markup=reply_markup)
 
 # Просмотр моих бронирований
 def show_my_bookings(update: Update, context: CallbackContext):
     query = update.callback_query
     user_id = query.from_user.id
     user_name = query.from_user.username or query.from_user.first_name
+    
     db_manager = get_db_manager()
     bookings = db_manager.get_user_bookings(user_id)
     
@@ -413,7 +414,7 @@ def show_my_bookings(update: Update, context: CallbackContext):
     keyboard = [[InlineKeyboardButton("⬅️ Назад", callback_data="main_menu")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    query.edit_message_text(message, reply_markup=reply_markup, parse_mode='Markdown')
+    query.edit_message_text(message, reply_markup=reply_markup)
 
 # Отмена моих бронирований
 def cancel_my_bookings(update: Update, context: CallbackContext):

@@ -6,6 +6,10 @@ class DatabaseManager:
     def __init__(self, db_file: str):
         self.db_file = db_file
         self.init_db()
+
+    def get_connection(self):
+        """Получение соединения с базой данных"""
+        return sqlite3.connect(self.db_file)
     
     def init_db(self):
         """Инициализация базы данных"""
@@ -79,7 +83,7 @@ class DatabaseManager:
     
     def get_user_bookings(self, user_id: int) -> List[Tuple]:
         """Получение бронирований пользователя"""
-        conn = sqlite3.connect(self.db_file)
+        conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("""
             SELECT date, start_time, end_time 
