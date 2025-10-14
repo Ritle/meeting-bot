@@ -82,15 +82,16 @@ class DatabaseManager:
         return bookings
     
     def get_user_bookings(self, user_id: int) -> List[Tuple]:
-        """Получение бронирований пользователя"""
+        """Получение бронирований пользователя (только будущие)"""
         conn = self.get_connection()
         cursor = conn.cursor()
+        current_date = datetime.now().strftime("%d.%m.%Y")
         cursor.execute("""
             SELECT date, start_time, end_time 
             FROM bookings 
-            WHERE user_id = ? AND date >= date('now') 
+            WHERE user_id = ? AND date >= ? 
             ORDER BY date, start_time
-        """, (user_id,))
+        """, (user_id, current_date))
         bookings = cursor.fetchall()
         conn.close()
         return bookings
