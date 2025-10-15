@@ -105,8 +105,6 @@ class DatabaseManager:
         """Получение бронирований пользователя (только будущие)"""
         conn = self.get_connection()
         cursor = conn.cursor()
-        current_date = datetime.now().strftime("%d.%m.%Y")
-        current_date_numeric = datetime.now().strftime("%Y%m%d")
         
         # Получаем все бронирования пользователя
         cursor.execute("""
@@ -118,16 +116,26 @@ class DatabaseManager:
         all_bookings = cursor.fetchall()
         conn.close()
         
-        # Фильтруем только будущие бронирования
+        # Фильтруем только будущие бронирования (с учетом даты и времени)
         filtered_bookings = []
+        now = datetime.now()
+        current_date_numeric = now.strftime("%Y%m%d")
+        current_time = now.strftime("%H:%M")
+        
         for date, start_time, end_time in all_bookings:
             try:
                 # Преобразуем дату из формата DD.MM.YYYY в YYYYMMDD
                 booking_date = datetime.strptime(date, "%d.%m.%Y")
                 booking_date_numeric = booking_date.strftime("%Y%m%d")
                 
-                if booking_date_numeric >= current_date_numeric:
+                # Если дата больше текущей - добавляем
+                if booking_date_numeric > current_date_numeric:
                     filtered_bookings.append((date, start_time, end_time))
+                # Если дата равна текущей - проверяем время
+                elif booking_date_numeric == current_date_numeric:
+                    # Сравниваем время начала с текущим временем
+                    if start_time >= current_time:
+                        filtered_bookings.append((date, start_time, end_time))
             except ValueError:
                 # Если формат даты некорректный, пропускаем
                 continue
