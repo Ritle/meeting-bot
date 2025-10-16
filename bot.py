@@ -569,6 +569,20 @@ def show_specific_rating(update: Update, context: CallbackContext):
     
     query.edit_message_text(message, reply_markup=reply_markup)  # Без parse_mode
 
+# Функция показа рейтинга
+def show_rating(update: Update, context: CallbackContext):
+    query = update.callback_query
+    
+    keyboard = [
+        [InlineKeyboardButton("🏆 Топ за месяц", callback_data="rating_month")],
+        [InlineKeyboardButton("🏆 Топ за год", callback_data="rating_year")],
+        [InlineKeyboardButton("🏆 Топ за всё время", callback_data="rating_all_time")],
+        [InlineKeyboardButton("⬅️ Назад", callback_data="main_menu")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    query.edit_message_text("📊 *Выберите период для просмотра рейтинга:*", reply_markup=reply_markup)
+
 def cancel_command(update: Update, context: CallbackContext):
     """Команда /cancel - отмена моих бронирований"""
     user_id = update.effective_user.id
@@ -637,7 +651,7 @@ def button_handler(update: Update, context: CallbackContext):
         return
       # Рейтинг
     elif query.data == "show_rating":
-        show_specific_rating(update, context)
+        show_rating(update, context)
         return
     
     elif query.data.startswith("rating_"):
