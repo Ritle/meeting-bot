@@ -637,7 +637,7 @@ def button_handler(update: Update, context: CallbackContext):
         return
       # Рейтинг
     elif query.data == "show_rating":
-        show_rating(update, context)
+        show_specific_rating(update, context)
         return
     
     elif query.data.startswith("rating_"):
