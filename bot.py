@@ -142,6 +142,16 @@ def show_main_menu(update: Update, message_text="🤖 Бот для бронир
 
 # Команда /start
 def start(update: Update, context: CallbackContext):
+
+    user_id = update.effective_user.id
+    user_name = update.effective_user.username or update.effective_user.first_name
+    first_name = update.effective_user.first_name
+    last_name = update.effective_user.last_name
+    
+    # Сохраняем информацию о пользователе
+    db_manager = get_db_manager()
+    db_manager.save_user(user_id, user_name, first_name, last_name)
+
     welcome_text = (
         "👋 *Добро пожаловать в бота для бронирования переговорной комнаты!* \n\n"
         "Выберите действие ниже:\n"
