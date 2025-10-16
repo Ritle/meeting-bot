@@ -533,11 +533,11 @@ def show_specific_rating(update: Update, context: CallbackContext):
     top_bookings = db_manager.get_top_users_by_bookings(year_filter, month_filter, 3)
     top_duration = db_manager.get_top_users_by_duration(year_filter, month_filter, 3)
     
-    # Формируем сообщение с HTML форматированием
-    message = f"<b>📊 Рейтинг пользователей {period_text}:</b>\n\n"
+    # Формируем сообщение БЕЗ форматирования
+    message = f"📊 Рейтинг пользователей {period_text}:\n\n"
     
     # Топ по количеству бронирований
-    message += "<b>📈 По количеству бронирований:</b>\n"
+    message += "📈 По количеству бронирований:\n"
     if top_bookings:
         for i, (user_id, username, count) in enumerate(top_bookings, 1):
             medal = ["🥇", "🥈", "🥉"][i-1] if i <= 3 else f"{i}."
@@ -549,7 +549,7 @@ def show_specific_rating(update: Update, context: CallbackContext):
     message += "\n"
     
     # Топ по длительности (в часах)
-    message += "<b>⏱️ По длительности бронирования:</b>\n"
+    message += "⏱️ По длительности бронирования:\n"
     if top_duration:
         for i, (user_id, username, minutes) in enumerate(top_duration, 1):
             hours = minutes // 60
@@ -567,7 +567,7 @@ def show_specific_rating(update: Update, context: CallbackContext):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    query.edit_message_text(message, reply_markup=reply_markup)
+    query.edit_message_text(message, reply_markup=reply_markup)  # Без parse_mode
 
 def cancel_command(update: Update, context: CallbackContext):
     """Команда /cancel - отмена моих бронирований"""
