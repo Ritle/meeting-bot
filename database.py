@@ -311,7 +311,7 @@ class DatabaseManager:
             cursor.execute("""
                 SELECT s.user_id, u.username, s.total_bookings
                 FROM stats s
-                JOIN users u ON s.user_id = u.user_id
+                LEFT JOIN users u ON s.user_id = u.user_id
                 WHERE s.year = ? AND s.month = ?
                 ORDER BY s.total_bookings DESC
                 LIMIT ?
@@ -322,7 +322,7 @@ class DatabaseManager:
             cursor.execute("""
                 SELECT s.user_id, u.username, SUM(s.total_bookings) as total_bookings
                 FROM stats s
-                JOIN users u ON s.user_id = u.user_id
+                LEFT JOIN users u ON s.user_id = u.user_id
                 WHERE s.year = ?
                 GROUP BY s.user_id
                 ORDER BY total_bookings DESC
@@ -334,7 +334,7 @@ class DatabaseManager:
             cursor.execute("""
                 SELECT s.user_id, u.username, SUM(s.total_bookings) as total_bookings
                 FROM stats s
-                JOIN users u ON s.user_id = u.user_id
+                LEFT JOIN users u ON s.user_id = u.user_id
                 GROUP BY s.user_id
                 ORDER BY total_bookings DESC
                 LIMIT ?
@@ -361,7 +361,7 @@ class DatabaseManager:
             cursor.execute("""
                 SELECT s.user_id, u.username, s.total_duration_minutes
                 FROM stats s
-                JOIN users u ON s.user_id = u.user_id
+                LEFT JOIN users u ON s.user_id = u.user_id
                 WHERE s.year = ? AND s.month = ?
                 ORDER BY s.total_duration_minutes DESC
                 LIMIT ?
@@ -372,7 +372,7 @@ class DatabaseManager:
             cursor.execute("""
                 SELECT s.user_id, u.username, SUM(s.total_duration_minutes) as total_duration
                 FROM stats s
-                JOIN users u ON s.user_id = u.user_id
+                LEFT JOIN users u ON s.user_id = u.user_id
                 WHERE s.year = ?
                 GROUP BY s.user_id
                 ORDER BY total_duration DESC
@@ -384,7 +384,7 @@ class DatabaseManager:
             cursor.execute("""
                 SELECT s.user_id, u.username, SUM(s.total_duration_minutes) as total_duration
                 FROM stats s
-                JOIN users u ON s.user_id = u.user_id
+                LEFT JOIN users u ON s.user_id = u.user_id
                 GROUP BY s.user_id
                 ORDER BY total_duration DESC
                 LIMIT ?
