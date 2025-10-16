@@ -6,7 +6,7 @@ from debug_db import init_db_manager
 
 def test_debug():
     # Инициализируем базу данных
-    db_manager = init_db_manager("test_meeting_room.db")
+    db_manager = init_db_manager("meeting_room.db")
     
     # Добавим тестовые данные вручную
     conn = db_manager.get_connection()
