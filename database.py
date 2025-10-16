@@ -353,7 +353,7 @@ def get_top_users_by_duration(self, year: int = None, month: int = None, limit: 
     conn = self.get_connection()
     cursor = conn.cursor()
     
-    print(f"DEBUG: get_top_users_by_duration called with year={year}, month={month}, limit={limit}")  # Отладка
+    print(f"DEBUG: get_top_users_by_duration ? called with year={year}, month={month}, limit={limit}")  # Отладка
     
     if year is not None and month is not None:
         # Топ за конкретный месяц
