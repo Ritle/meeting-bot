@@ -130,6 +130,7 @@ def show_main_menu(update: Update, message_text="🤖 Бот для бронир
         [InlineKeyboardButton("📋 Расписание", callback_data="show_schedule")],
         [InlineKeyboardButton("📅 Мои бронирования", callback_data="my_bookings")],
         [InlineKeyboardButton("🗑️ Отменить мои брони", callback_data="cancel_my_bookings")],
+        [InlineKeyboardButton("📊 Рейтинг", callback_data="show_rating")],
         [InlineKeyboardButton("❓ Помощь", callback_data="help")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -491,6 +492,88 @@ def my_bookings_command(update: Update, context: CallbackContext):
     
     update.message.reply_text(message, parse_mode='Markdown')
 
+# Функция отображения конкретного рейтинга
+def show_specific_rating(update: Update, context: CallbackContext):
+    query = update.callback_query
+    user_id = query.from_user.id
+    
+    # Определяем тип рейтинга
+    rating_type = query.data.replace("rating_", "")
+    
+    current_date = datetime.now()
+    year = current_date.year
+    month = current_date.month
+    
+    if rating_type == "month":
+        period_text = f"за {current_date.strftime('%B %Y')}"
+        year_filter = year
+        month_filter = month
+    elif rating_type == "year":
+        period_text = f"за {year} год"
+        year_filter = year
+        month_filter = None
+    else:  # all_time
+        period_text = "за всё время"
+        year_filter = None
+        month_filter = None
+    
+    # Получаем топы
+    db_manager = get_db_manager()
+    
+    # Топ по количеству бронирований
+    top_bookings = db_manager.get_top_users_by_bookings(year_filter, month_filter, 3)
+    
+    # Топ по длительности
+    top_duration = db_manager.get_top_users_by_duration(year_filter, month_filter, 3)
+    
+    # Формируем сообщение
+    message = f"📊 *Рейтинг пользователей {period_text}:*\n\n"
+    
+    # Топ по количеству бронирований
+    message += "📈 *По количеству бронирований:*\n"
+    if top_bookings:
+        for i, (user_id, username, count) in enumerate(top_bookings, 1):
+            medal = ["🥇", "🥈", "🥉"][i-1] if i <= 3 else f"{i}."
+            message += f"  {medal} @{username} - {count} брон.\n"
+    else:
+        message += "  Нет данных\n"
+    
+    message += "\n"
+    
+    # Топ по длительности (в часах)
+    message += "⏱️ *По длительности бронирования:*\n"
+    if top_duration:
+        for i, (user_id, username, minutes) in enumerate(top_duration, 1):
+            hours = minutes // 60
+            mins = minutes % 60
+            duration_text = f"{hours}ч {mins}мин" if hours > 0 else f"{mins}мин"
+            medal = ["🥇", "🥈", "🥉"][i-1] if i <= 3 else f"{i}."
+            message += f"  {medal} @{username} - {duration_text}\n"
+    else:
+        message += "  Нет данных\n"
+    
+    keyboard = [
+        [InlineKeyboardButton("📊 Другой период", callback_data="show_rating")],
+        [InlineKeyboardButton("⬅️ Назад", callback_data="main_menu")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    query.edit_message_text(message, reply_markup=reply_markup, parse_mode='Markdown')
+
+# Функция показа рейтинга
+def show_rating(update: Update, context: CallbackContext):
+    query = update.callback_query
+    
+    keyboard = [
+        [InlineKeyboardButton("🏆 Топ за месяц", callback_data="rating_month")],
+        [InlineKeyboardButton("🏆 Топ за год", callback_data="rating_year")],
+        [InlineKeyboardButton("🏆 Топ за всё время", callback_data="rating_all_time")],
+        [InlineKeyboardButton("⬅️ Назад", callback_data="main_menu")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    query.edit_message_text("📊 *Выберите период для просмотра рейтинга:*", reply_markup=reply_markup)
+
 def cancel_command(update: Update, context: CallbackContext):
     """Команда /cancel - отмена моих бронирований"""
     user_id = update.effective_user.id
@@ -556,6 +639,14 @@ def button_handler(update: Update, context: CallbackContext):
     # Отключенные кнопки
     elif query.data.startswith("disabled_"):
         query.answer("❌ Это время недоступно", show_alert=True)
+        return
+      # Рейтинг
+    elif query.data == "show_rating":
+        show_rating(update, context)
+        return
+    
+    elif query.data.startswith("rating_"):
+        show_specific_rating(update, context)
         return
 
 def main():
