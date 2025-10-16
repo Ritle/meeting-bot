@@ -567,7 +567,7 @@ def show_specific_rating(update: Update, context: CallbackContext):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    query.edit_message_text(message, reply_markup=reply_markup, parse_mode='HTML')
+    query.edit_message_text(message, reply_markup=reply_markup)
 
 def cancel_command(update: Update, context: CallbackContext):
     """Команда /cancel - отмена моих бронирований"""
