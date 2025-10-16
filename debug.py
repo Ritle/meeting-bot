@@ -2,7 +2,7 @@
 import sys
 sys.path.append('.')
 
-from debug_database import init_db_manager
+from debug_db import init_db_manager
 
 def test_debug():
     # Инициализируем базу данных
