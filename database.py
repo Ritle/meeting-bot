@@ -300,101 +300,95 @@ class DatabaseManager:
     
     def get_top_users_by_bookings(self, year: int = None, month: int = None, limit: int = 3) -> List[Tuple]:
         """Получение топ пользователей по количеству бронирований"""
+        # Ограничиваем лимит для безопасности
+        limit = max(1, min(limit, 50))
+        
         conn = self.get_connection()
         cursor = conn.cursor()
-    
-        print(f"DEBUG: get_top_users_by_bookings called with year={year}, month={month}, limit={limit}")  # Отладка
-    
+        
         if year is not None and month is not None:
             # Топ за конкретный месяц
-            print(f"DEBUG: Запрос за конкретный месяц: {year}-{month:02d}")
-            cursor.execute("""
+            query = f"""
                 SELECT s.user_id, u.username, s.total_bookings
                 FROM stats s
                 JOIN users u ON s.user_id = u.user_id
                 WHERE s.year = ? AND s.month = ?
                 ORDER BY s.total_bookings DESC
-                LIMIT ?
-            """, (year, month, limit))
+                LIMIT {limit}
+            """
+            cursor.execute(query, (year, month))
         elif year is not None:
             # Топ за конкретный год
-            print(f"DEBUG: Запрос за конкретный год: {year}")
-            cursor.execute("""
+            query = f"""
                 SELECT s.user_id, u.username, SUM(s.total_bookings) as total_bookings
                 FROM stats s
                 JOIN users u ON s.user_id = u.user_id
                 WHERE s.year = ?
                 GROUP BY s.user_id
                 ORDER BY total_bookings DESC
-                LIMIT ?
-            """, (year, limit))
+                LIMIT {limit}
+            """
+            cursor.execute(query, (year,))
         else:
             # Топ за всё время
-            print("DEBUG: Запрос за всё время")
-            cursor.execute("""
+            query = f"""
                 SELECT s.user_id, u.username, SUM(s.total_bookings) as total_bookings
                 FROM stats s
                 JOIN users u ON s.user_id = u.user_id
                 GROUP BY s.user_id
                 ORDER BY total_bookings DESC
-                LIMIT ?
-            """, (limit,))
+                LIMIT {limit}
+            """
+            cursor.execute(query)
         
         results = cursor.fetchall()
-        print(f"DEBUG: Результаты запроса: {len(results)} записей")
-        for result in results:
-            print(f"  DEBUG: {result}")
-        
         conn.close()
         return results
 
     def get_top_users_by_duration(self, year: int = None, month: int = None, limit: int = 3) -> List[Tuple]:
         """Получение топ пользователей по длительности бронирования"""
+        # Ограничиваем лимит для безопасности
+        limit = max(1, min(limit, 50))
+        
         conn = self.get_connection()
         cursor = conn.cursor()
         
-        print(f"DEBUG: get_top_users_by_duration ? called with year={year}, month={month}, limit={limit}")  # Отладка
-        
         if year is not None and month is not None:
             # Топ за конкретный месяц
-            print(f"DEBUG: Запрос за конкретный месяц: {year}-{month:02d}")
-            cursor.execute("""
+            query = f"""
                 SELECT s.user_id, u.username, s.total_duration_minutes
                 FROM stats s
                 JOIN users u ON s.user_id = u.user_id
                 WHERE s.year = ? AND s.month = ?
                 ORDER BY s.total_duration_minutes DESC
-                LIMIT ?
-            """, (year, month, limit))
+                LIMIT {limit}
+            """
+            cursor.execute(query, (year, month))
         elif year is not None:
             # Топ за конкретный год
-            print(f"DEBUG: Запрос за конкретный год: {year}")
-            cursor.execute("""
+            query = f"""
                 SELECT s.user_id, u.username, SUM(s.total_duration_minutes) as total_duration
                 FROM stats s
                 JOIN users u ON s.user_id = u.user_id
                 WHERE s.year = ?
                 GROUP BY s.user_id
                 ORDER BY total_duration DESC
-                LIMIT ?
-            """, (year, limit))
+                LIMIT {limit}
+            """
+            cursor.execute(query, (year,))
         else:
             # Топ за всё время
-            print("DEBUG: Запрос за всё время")
-            cursor.execute("""
+            query = f"""
                 SELECT s.user_id, u.username, SUM(s.total_duration_minutes) as total_duration
                 FROM stats s
                 JOIN users u ON s.user_id = u.user_id
                 GROUP BY s.user_id
                 ORDER BY total_duration DESC
-                LIMIT ?
-            """, (limit,))
+                LIMIT {limit}
+            """
+            cursor.execute(query)
         
         results = cursor.fetchall()
-        print(f"DEBUG: Результаты запроса: {len(results)} записей")
-        for result in results:
-            print(f"  DEBUG: {result}")
-        
         conn.close()
         return results
 
