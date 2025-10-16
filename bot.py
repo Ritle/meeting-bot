@@ -530,20 +530,18 @@ def show_specific_rating(update: Update, context: CallbackContext):
     # Получаем топы
     db_manager = get_db_manager()
     
-    # Топ по количеству бронирований
     top_bookings = db_manager.get_top_users_by_bookings(year_filter, month_filter, 3)
-    
-    # Топ по длительности
     top_duration = db_manager.get_top_users_by_duration(year_filter, month_filter, 3)
     
-    # Формируем сообщение
-    message = f"📊 *Рейтинг пользователей {period_text}:*\n\n"
+    # Формируем сообщение с HTML форматированием
+    message = f"<b>📊 Рейтинг пользователей {period_text}:</b>\n\n"
     
     # Топ по количеству бронирований
-    message += "📈 *По количеству бронирований:*\n"
+    message += "<b>📈 По количеству бронирований:</b>\n"
     if top_bookings:
         for i, (user_id, username, count) in enumerate(top_bookings, 1):
             medal = ["🥇", "🥈", "🥉"][i-1] if i <= 3 else f"{i}."
+            username = username or f"user_{user_id}"  # Если username None
             message += f"  {medal} @{username} - {count} брон.\n"
     else:
         message += "  Нет данных\n"
@@ -551,13 +549,14 @@ def show_specific_rating(update: Update, context: CallbackContext):
     message += "\n"
     
     # Топ по длительности (в часах)
-    message += "⏱️ *По длительности бронирования:*\n"
+    message += "<b>⏱️ По длительности бронирования:</b>\n"
     if top_duration:
         for i, (user_id, username, minutes) in enumerate(top_duration, 1):
             hours = minutes // 60
             mins = minutes % 60
             duration_text = f"{hours}ч {mins}мин" if hours > 0 else f"{mins}мин"
             medal = ["🥇", "🥈", "🥉"][i-1] if i <= 3 else f"{i}."
+            username = username or f"user_{user_id}"  # Если username None
             message += f"  {medal} @{username} - {duration_text}\n"
     else:
         message += "  Нет данных\n"
@@ -568,21 +567,7 @@ def show_specific_rating(update: Update, context: CallbackContext):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    query.edit_message_text(message, reply_markup=reply_markup, parse_mode='Markdown')
-
-# Функция показа рейтинга
-def show_rating(update: Update, context: CallbackContext):
-    query = update.callback_query
-    
-    keyboard = [
-        [InlineKeyboardButton("🏆 Топ за месяц", callback_data="rating_month")],
-        [InlineKeyboardButton("🏆 Топ за год", callback_data="rating_year")],
-        [InlineKeyboardButton("🏆 Топ за всё время", callback_data="rating_all_time")],
-        [InlineKeyboardButton("⬅️ Назад", callback_data="main_menu")]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    query.edit_message_text("📊 *Выберите период для просмотра рейтинга:*", reply_markup=reply_markup)
+    query.edit_message_text(message, reply_markup=reply_markup, parse_mode='HTML')
 
 def cancel_command(update: Update, context: CallbackContext):
     """Команда /cancel - отмена моих бронирований"""
