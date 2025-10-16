@@ -361,7 +361,7 @@ class DatabaseManager:
                 JOIN users u ON s.user_id = u.user_id
                 WHERE s.year = ? AND s.month = ?
                 ORDER BY s.total_duration_minutes DESC
-                LIMIT {limit}
+                LIMIT 3
             """
             cursor.execute(query, (year, month))
         elif year is not None:
@@ -373,7 +373,7 @@ class DatabaseManager:
                 WHERE s.year = ?
                 GROUP BY s.user_id
                 ORDER BY total_duration DESC
-                LIMIT {limit}
+                LIMIT 3
             """
             cursor.execute(query, (year,))
         else:
@@ -384,7 +384,7 @@ class DatabaseManager:
                 JOIN users u ON s.user_id = u.user_id
                 GROUP BY s.user_id
                 ORDER BY total_duration DESC
-                LIMIT {limit}
+                LIMIT 3
             """
             cursor.execute(query)
         
